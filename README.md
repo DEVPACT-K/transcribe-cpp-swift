@@ -7,6 +7,30 @@ The package contains the tagged Swift wrapper source and references the matching
 upstream release XCFramework by URL and checksum. It does not duplicate the
 native binary in this repository.
 
+## How it works
+
+FluidVoice does not connect to a Handy service while transcribing. The dependency
+flow happens when SwiftPM resolves and builds the app:
+
+```text
+FluidVoice
+  -> altic-dev/transcribe-cpp-swift (official Swift wrapper source)
+  -> handy-computer/transcribe.cpp v0.1.2 release (native CTranscribe XCFramework)
+```
+
+1. FluidVoice pins this package to an exact version.
+2. This package's `CTranscribe` binary target points to Handy's matching GitHub
+   release XCFramework.
+3. SwiftPM downloads the XCFramework once and rejects it if its SHA-256 checksum
+   does not match the value in `Package.swift`.
+4. The Swift wrapper compiles against `CTranscribe`, and the consuming app embeds
+   and signs that framework.
+5. Transcription then runs locally. No Handy server or runtime API call is used.
+
+Speech model downloads are separate from this package and are managed by the
+consuming app. After the package and selected model are cached, transcription can
+run offline.
+
 ## Install
 
 ```swift
