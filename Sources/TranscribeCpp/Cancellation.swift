@@ -1,4 +1,5 @@
 import CTranscribe
+import Foundation
 import os
 
 /// A thread-safe cancellation flag. Install it on a `Session` with
