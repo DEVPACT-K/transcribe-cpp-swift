@@ -7,13 +7,14 @@ import os
 /// abort an in-flight run/stream. The run then throws `.aborted` with the
 /// partial transcript preserved.
 public final class CancellationToken: @unchecked Sendable {
-    private let cancelled = OSAllocatedUnfairLock(initialState: false)
+    private var _cancelled = false
+    private let lock = NSLock()
 
     public init() {}
 
-    public func cancel() { cancelled.withLock { $0 = true } }
-    public func reset() { cancelled.withLock { $0 = false } }
-    public var isCancelled: Bool { cancelled.withLock { $0 } }
+    public func cancel() { lock.lock(); defer { lock.unlock() }; _cancelled = true }
+    public func reset() { lock.lock(); defer { lock.unlock() }; _cancelled = false }
+    public var isCancelled: Bool { lock.lock(); defer { lock.unlock() }; return _cancelled }
 }
 
 /// C-ABI abort trampoline: reconstitutes the token from the userdata pointer
