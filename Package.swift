@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "transcribe-cpp-swift",
     platforms: [
-        .macOS(.v13),
+        .macOS("12.7"),
         .iOS(.v16),
     ],
     products: [
